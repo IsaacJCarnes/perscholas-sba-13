@@ -51,4 +51,27 @@ productRouter.delete("/:id", async (req, res) => {
   }
 });
 
+productRouter.get("/", async (req, res) => {
+  try {
+    const category = req.query.category ?? "";
+    const minPrice = req.query.minPrice ?? 1;
+    const maxPrice = req.query.maxPrice ?? 100;
+    const sortBy = req.query.sortBy == "price_desc" ? -1 : 1;
+    const page = req.query.page ?? 1;
+    const limit = req.query.limit ?? 10;
+    const offset = (page - 1) * limit;
+    const filter = {
+      category,
+      price: { $gt: minPrice, $lt: maxPrice },
+    };
+    const products = await Product.find(filter)
+      .sort({ price: sortBy })
+      .skip(offset)
+      .limit(limit);
+    return res.status(200).json(products);
+  } catch (error) {
+    return res.status(404).json({ message: "Unable to get products" });
+  }
+});
+
 export default productRouter;
