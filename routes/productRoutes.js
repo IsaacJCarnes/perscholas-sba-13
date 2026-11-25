@@ -53,7 +53,7 @@ productRouter.delete("/:id", async (req, res) => {
 
 productRouter.get("/", async (req, res) => {
   try {
-    const category = req.query.category ?? "";
+    const category = req.query.category ?? null;
     const minPrice = req.query.minPrice ?? 1;
     const maxPrice = req.query.maxPrice ?? 100;
     const sortBy = req.query.sortBy == "price_desc" ? -1 : 1;
@@ -61,7 +61,7 @@ productRouter.get("/", async (req, res) => {
     const limit = req.query.limit ?? 10;
     const offset = (page - 1) * limit;
     const filter = {
-      category,
+      ...(category && {category: category}),
       price: { $gt: minPrice, $lt: maxPrice },
     };
     const products = await Product.find(filter)
